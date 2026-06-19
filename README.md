@@ -46,7 +46,7 @@ Sistem, çalışma anında donanımın çökmesini, bellek taşmalarını veya r
 | **VRAM Segment Drift** | Ekran hafızasına (`0xB800h`) yazarken koordinatların veya ofsetin ekran sınırını aşması. | Toplam ekran hücresi boyutu olan 2000 karakter sınırında `LOOP` sayacının otomatik kırılması ve işlemcinin dondurulması. |
 | **Stack Corruption** | BIOS/DOS kesmelerine (`INT`) girerken veya fonksiyon çağırırken koordinat yazmaçlarının (`DX`) ezilmesi. | Kesme çağrılmadan hemen önce verinin `PUSH DX` ile yığına saklanması, kesme çıkışında `POP DX` ile bellek emniyetinin sağlanması. |
 | **File Descriptor Leak** | Runtime esnasında skoru diske (`syslog.txt`) yazarken yarıda kesilme veya handle kaybı yaşanması. | `INT 21h / AH=3Ch` ile alınan dosya handle numarasının anında `BX` yazmacına kilitlenmesi ve işlemin `AH=3Eh` ile donanımsal kapatılması. |
-| **Invalid Boot Signature** | BIOS'un açılış sektörünü (Sector 0) okuduğunda geçerli bir işletim sistemi çekirdeği bulamaması. | Kodun tam olarak 510. byte'ına `ORG 7DFEh` komutuyla erişilmesi ve son iki byte'a önyükleme imzası olan `0xAA55h` verisinin kazınması. |
+| **Invalid Boot Signature** | BIOS'un açılış sektörünü (Sector 0) okuduğunda geçerli bir işletim sistemi çekirdeği bulamaması. | Kodun tam olarak 510. byte'ına `ORG 7DFEh` komutuyla erişilmesi ve son iki byte'a önyükleme imzası olan `0xAA55h` verisinin kaydedilmesi. |
 
 ## Project Structure
 
