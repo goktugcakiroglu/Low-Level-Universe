@@ -1,4 +1,4 @@
-# Low-Level Universe: Bare-Metal x86 Assembly Portfolio 🏛️
+# Low-Level Universe: Bare-Metal x86 Assembly Portfolio
 
 Low-Level-Universe, Intel 8086 mikroişlemci mimarisinin sınırlarını zorlayan, üst seviye dillerin soyutlamalarından tamamen arındırılmış bir **saf donanım ve sistem programlama** portföyüdür. Proje; modüler kod kütüphanelerinden (include mimarisi), kurumsal bellek yönetimine (EXE Çoklu Segmentasyonu), bilgisayarın ilk açılış saniyesini ele geçiren Bootloader tasarımlarından, doğrudan video belleğine (VRAM) bodoslama dalan Grafik Motorlarına kadar donanım yazılım arayüzünün (Hardware-Software Interface) incığını cıncığını çıkaran 4 farklı katmandan oluşur.
 
