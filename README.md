@@ -71,6 +71,7 @@ Low-Level-Universe/
 │
 └── 📁 04-Pure-VRAM-BIN/              # Direct Hardware Manipulation Layer (Flat Binary)
     └── vram_filler.asm               # Non-OS hardware injection writing directly to VRAM 0xB800
+```
 
 ## Future Work 
 
