@@ -1,28 +1,28 @@
-# Low-Level Universe: Bare-Metal x86 Assembly Portfolio
+# Low-Level Universe: Bare-Metal x86 Assembly Portfolio 🏛️
 
-Low-Level-Universe, Intel 8086 mikroişlemci mimarisinin sınırlarını zorlayan, üst seviye dillerin soyutlamalarından tamamen arındırılmış bir **saf donanım ve sistem programlama** portföyüdür. Proje; modüler kod kütüphanelerinden (include mimarisi), kurumsal bellek yönetimine (EXE Çoklu Segmentasyonu), bilgisayarın ilk açılış saniyesini ele geçiren Bootloader tasarımlarından, doğrudan video belleğine (VRAM) bodoslama dalan Grafik Motorlarına kadar donanım yazılım arayüzünün (Hardware-Software Interface) detaylıca çıkaran 4 farklı katmandan oluşur.
+Low-Level-Universe, Intel 8086 mikroişlemci mimarisinin sınırlarını genişleten ve üst seviye dillerin soyutlama katmanlarından tamamen arındırılmış bir **düşük seviyeli sistem programlama** portfolyüdür. Proje; modüler kod kütüphanelerinden (include mimarisi), kurumsal bellek yönetimine (EXE Çoklu Segmentasyonu), bilgisayarın ilk açılış saniyesini yöneten Bootloader tasarımlarından, doğrudan video belleğine (VRAM) erişim sağlayan Grafik Motorlarına kadar donanım-yazılım arayüzünün (Hardware-Software Interface) derinliklerini analiz eden 4 farklı katmandan oluşur.
 
-**Not:** Bu proje internetten kopyalanmış veya basit ödev kalıplarına sıkışmış spagetti kod bloklarından oluşmaz. Tamamen **Modüler Programlama**, **Bellek Segmentasyonu İzolasyonu** ve **Direct Memory-Mapped I/O** prensipleriyle tasarlanmış; donanım kayıtçılarının (registers), yığın alanlarının (stack) ve kesme vektörlerinin (interrupts) yazılımcı tarafından doğrudan yönetildiği bir düşük seviyeli yazılım ekosistemidir.
+**Not:** Bu proje, konvansiyonel ödev kalıplarına sıkışmış monolitik kod bloklarından oluşmaz. Tamamen **Modüler Programlama**, **Bellek Segmentasyonu İzolasyonu** ve **Direct Memory-Mapped I/O** prensipleriyle tasarlanmış; donanım kayıtçılarının (registers), yığın alanlarının (stack) ve kesme vektörlerinin (interrupts) yazılımcı tarafından doğrudan yönetildiği kurumsal bir alt seviye yazılım ekosistemidir.
 
 ## Requirements
 
 Projeleri simüle etmek, derlemek ve donanım çıktılarını gözlemlemek için aşağıdaki ortam gereksinimlerine ihtiyaç vardır:
 * **Operating System:** Windows / Linux / macOS (Emülatör veya DOSBox katmanıyla çapraz platform uyumlu)
-* **Development & Simulation Environment:** EMU8086 Microprocessor Emulator (v4.08+) veya saf NASM/MASM derleyicileri ile DOSBox alt yapısı.
+* **Development & Simulation Environment:** EMU8086 Microprocessor Emulator (v4.08+) veya yerel NASM/MASM derleyicileri ile yapılandırılmış DOSBox altyapısı.
 
 ## Build & Run
 
 1. Projeyi yerel bilgisayarınıza klonlayın veya indirin.
 2. **01-Moduler-Oyun-Motoru için:** EMU8086 emülatörünü açın, `01-Moduler-Oyun-Motoru/main.asm` dosyasını yükleyin. Üst menüden `Emulate` butonuna basın. Derleyici yan yana duran tüm `.inc` kütüphanelerini otomatik olarak tek gövdede birleştirecektir. `Run` dediğinizde asenkron oyun motoru ateşlenecektir.
-3. **02-Guvenli-Kasa-EXE için:** `secure_vault.asm` dosyasını açıp derlediğinizde sol üstte otomatik olarak çoklu segmentli `.exe` şablonunun çalıştığını göreceksiniz.
+3. **02-Guvenli-Kasa-EXE için:** `secure_vault.asm` dosyasını açıp derlediğinizde çoklu segmentli `.exe` şablonunun çalıştığını göreceksiniz.
 4. **03-Goktug-OS-BOOT için:** `goktug_os.asm` dosyasını açıp emüle ettiğinizde, emülatör otomatik olarak sanal bir Floppy Disk (Disket) sürücüsü oluşturacak ve sistemi sıfırdan bu disketten boot edecektir.
-5. **04-Pure-VRAM-BIN için:** `vram_filler.asm` dosyasını çalıştırıp ekran kartı hafızasının nasıl saliseler içinde manipüle edildiğini izleyin.
+5. **04-Pure-VRAM-BIN için:** `vram_filler.asm` dosyasını çalıştırıp ekran kartı hafızasının donanım seviyesinde nasıl manipüle edildiğini izleyin.
 
 ## How It Works (The Pipeline)
 
-Sistemlerin donanım üzerinde ayağa kalkma, belleği işleme ve alt segmentleri sömürme süreci 3 ana operasyonel aşamadan oluşur:
+Sistemlerin donanım üzerinde ayağa kalkma, belleği işleme ve alt segmentleri yönetme süreci 3 ana operasyonel aşamadan oluşur:
 
-1. **Pass 1 — Template & Model Definition (Mimari Seçimi):** Derleyici kodun en başındaki direktiflere bakar. Eğer `ORG 100h` varsa tek bir 64KB hücreye sıkışacak `COM` modelini, `SEGMENT` tanımları varsa çoklu bellek bloklarına yayılacak `EXE` modelini, `ORG 7C00h` varsa doğrudan BIOS'un RAM'e şak diye haritalayacağı `BOOT MBR` sektör modelini işlemciye hazırlar.
+1. **Pass 1 — Template & Model Definition (Mimari Seçimi):** Derleyici kodun en başındaki direktifleri analiz eder. Eğer `ORG 100h` varsa tek bir 64KB hücreye sıkışacak `COM` modelini, `SEGMENT` tanımları varsa çoklu bellek bloklarına yayılacak `EXE` modelini, `ORG 7C00h` varsa doğrudan BIOS'un RAM'e haritalayacağı `BOOT MBR` sektör modelini işlemciye hazırlar.
 2. **Pass 2 — Register Allocation & Stack Alignment (Yazmaç ve Yığın Yönetimi):** Program çalışma anına girdiğinde veri segmentinin (`DS`), kod segmentinin (`CS`) ve yığının (`SS`) adres sınırları donanıma bildirilir. Fonksiyonlar arası veri geçişlerinde veya donanım kesmelerine dalınırken `PUSH` ve `POP` komutları kullanılarak işlemcinin anlık hafıza haritası (VRAM koordinatları, dosya işaretçileri) yığın üzerinde mutlak emniyete alınır.
 3. **Pass 3 — Asynchronous Polling & Hardware I/O (Kesme ve Çevre Birim Yönetimi):** Sistem, işlemciyi donduran bloklayıcı fonksiyonlar yerine, klavye tampon belleğini (`Keyboard Buffer`) arka planda sürekli tarayan asenkron bir `Polling` (`INT 16h / AH=01h`) döngüsü işletir. Girdiler anlık yakalanırken, eş zamanlı olarak sabit disk kesmeleriyle (`INT 21h`) kalıcı veri günlüğü (`syslog.txt`) tutulur veya doğrudan donanım portlarına yazılır.
 
@@ -43,7 +43,7 @@ Sistem, çalışma anında donanımın çökmesini, bellek taşmalarını veya r
 
 | Sınır / Risk Tipi | Tetiklenme Koşulu | Donanımsal / Mimari Çözüm |
 | :--- | :--- | :--- |
-| **VRAM Segment Drift** | Ekran hafızasına (`0xB800h`) bodoslama yazarken koordinatların veya ofsetin ekran sınırını aşması. | Toplam ekran hücresi boyutu olan 2000 karakter sınırında `LOOP` sayacının otomatik kırılması ve işlemcinin dondurulması. |
+| **VRAM Segment Drift** | Ekran hafızasına (`0xB800h`) yazarken koordinatların veya ofsetin ekran sınırını aşması. | Toplam ekran hücresi boyutu olan 2000 karakter sınırında `LOOP` sayacının otomatik kırılması ve işlemcinin dondurulması. |
 | **Stack Corruption** | BIOS/DOS kesmelerine (`INT`) girerken veya fonksiyon çağırırken koordinat yazmaçlarının (`DX`) ezilmesi. | Kesme çağrılmadan hemen önce verinin `PUSH DX` ile yığına saklanması, kesme çıkışında `POP DX` ile bellek emniyetinin sağlanması. |
 | **File Descriptor Leak** | Runtime esnasında skoru diske (`syslog.txt`) yazarken yarıda kesilme veya handle kaybı yaşanması. | `INT 21h / AH=3Ch` ile alınan dosya handle numarasının anında `BX` yazmacına kilitlenmesi ve işlemin `AH=3Eh` ile donanımsal kapatılması. |
 | **Invalid Boot Signature** | BIOS'un açılış sektörünü (Sector 0) okuduğunda geçerli bir işletim sistemi çekirdeği bulamaması. | Kodun tam olarak 510. byte'ına `ORG 7DFEh` komutuyla sızılması ve son iki byte'a kutsal önyükleme imzası olan `0xAA55h` verisinin kazınması. |
@@ -73,7 +73,7 @@ Low-Level-Universe/
     └── vram_filler.asm               # Non-OS hardware injection writing directly to VRAM 0xB800
 ```
 
-## Future Work 
+## Future Work
 
 **Inline Assembly Entegrasyonu:** Bu repodaki en kritik performans modüllerinin (özellikle bit kaydırma ve bellek kopyalama) modern C/C++ projelerinin içine __asm bloklarıyla gömülerek hibrit sistem yazılımlarına dönüştürülmesi.
 
