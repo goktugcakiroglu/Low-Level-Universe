@@ -1,0 +1,38 @@
+name: Bare-Metal Assembly CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install NASM Compiler
+      run: sudo apt-get update && sudo apt-get install -y nasm
+
+    - name: Compile Goktug OS Bootloader (Bare-Metal Sector)
+      run: |
+        echo "Building Bootloader Kernel..."
+        if [ -f "03-Goktug-OS-BOOT/goktug_os.asm" ]; then
+          nasm -f bin 03-Goktug-OS-BOOT/goktug_os.asm -o goktug_os.bin
+          echo "Success: goktug_os.bin generated!"
+        else
+          echo "Bootloader source not found, skipping."
+        fi
+
+    - name: Compile VRAM Filler (Pure Binary Memory Map)
+      run: |
+        echo "Building Direct VRAM Engine..."
+        if [ -f "04-Pure-VRAM-BIN/vram_filler.asm" ]; then
+          nasm -f bin 04-Pure-VRAM-BIN/vram_filler.asm -o vram_filler.bin
+          echo "Success: vram_filler.bin generated!"
+        else
+          echo "VRAM source not found, skipping."
+        fi
