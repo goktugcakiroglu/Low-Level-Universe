@@ -20,11 +20,17 @@ jobs:
     - name: Adapt EMU8086 Syntax for NASM Compatibility
       run: |
         echo "Translating MASM/EMU8086 dialect to strict NASM..."
-        # #make_boot# etiketini yorum satirina cevir
-        find . -name "*.asm" -exec sed -i 's/^#make_boot#/; #make_boot#/g' {} +
-        # MASM'a ozel 'BYTE PTR' ve 'WORD PTR' ifadelerini NASM formatina cevir
-        find . -name "*.asm" -exec sed -i 's/BYTE PTR/BYTE/g' {} +
-        find . -name "*.asm" -exec sed -i 's/WORD PTR/WORD/g' {} +
+        # 1. #make_boot# etiketini yorum yap
+        find . -name "*.asm" -exec sed -i 's/^#make_boot#/; #make_boot#/gi' {} +
+        # 2. BYTE PTR ve WORD PTR ifadelerini NASM formatina cevir
+        find . -name "*.asm" -exec sed -i 's/BYTE PTR/BYTE/gi' {} +
+        find . -name "*.asm" -exec sed -i 's/WORD PTR/WORD/gi' {} +
+        # 3. MASM PROC NEAR ifadelerini NASM etiketi formatina (:) cevir
+        find . -name "*.asm" -exec sed -i 's/PROC NEAR/:/gi' {} +
+        # 4. NASM'in anlamadigi ENDP iceren satirlari tamamen yorum satirina cevir
+        find . -name "*.asm" -exec sed -i 's/.*ENDP.*/; &/' {} +
+        # 5. NASM buyuk/kucuk harfe duyarlidir. VRAM dosyasindaki donguyu esitle.
+        find . -name "*.asm" -exec sed -i 's/ekrani_boya_dongu/EKRANI_BOYA_DONGU/gi' {} +
 
     - name: Compile Goktug OS Bootloader (Bare-Metal Sector)
       run: |
