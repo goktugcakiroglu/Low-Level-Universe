@@ -1,8 +1,37 @@
-# Low-Level Universe: Bare-Metal x86 Assembly Portfolio 
+[![Bare-Metal Assembly CI](https://github.com/goktugcakiroglu/Low-Level-Universe/actions/workflows/assembly-ci.yml/badge.svg)](https://github.com/goktugcakiroglu/Low-Level-Universe/actions/workflows/assembly-ci.yml)
 
-Low-Level-Universe, Intel 8086 mikroişlemci mimarisinin sınırlarını genişleten ve üst seviye dillerin soyutlama katmanlarından tamamen arındırılmış bir **düşük seviyeli sistem programlama** portfolyüdür. Proje; modüler kod kütüphanelerinden (include mimarisi), kurumsal bellek yönetimine (EXE Çoklu Segmentasyonu), bilgisayarın ilk açılış saniyesini yöneten Bootloader tasarımlarından, doğrudan video belleğine (VRAM) erişim sağlayan Grafik Motorlarına kadar donanım-yazılım arayüzünün (Hardware-Software Interface) derinliklerini analiz eden 4 farklı katmandan oluşur.
+Low-Level-Universe, Intel 8086 mikroişlemci mimarisinin sınırlarını genişleten ve üst seviye dillerin soyutlama katmanlarından tamamen arındırılmış bir **düşük seviyeli sistem programlama** portfolyösüdür. Proje; modüler kod kütüphanelerinden (include mimarisi), kurumsal bellek yönetimine (EXE Çoklu Segmentasyonu), bilgisayarın ilk açılış saniyesini yöneten Bootloader tasarımlarından, doğrudan video belleğine (VRAM) erişim sağlayan Grafik Motorlarına kadar donanım-yazılım arayüzünün (Hardware-Software Interface) derinliklerini analiz eden 4 farklı katmandan oluşur.
 
 **Not:** Bu proje, konvansiyonel ödev kalıplarına sıkışmış monolitik kod bloklarından oluşmaz. Tamamen **Modüler Programlama**, **Bellek Segmentasyonu İzolasyonu** ve **Direct Memory-Mapped I/O** prensipleriyle tasarlanmış; donanım kayıtçılarının (registers), yığın alanlarının (stack) ve kesme vektörlerinin (interrupts) yazılımcı tarafından doğrudan yönetildiği kurumsal bir alt seviye yazılım ekosistemidir.
+
+## 🏗️ Execution Layers & Memory Architecture
+
+Aşağıdaki mimari şema, projelerin işlemci (CPU) ve Fiziksel Bellek (RAM) üzerinde hangi güvenlik halkasında (Ring) çalıştığını ve donanımı nasıl kontrol ettiğini göstermektedir.
+
+```mermaid
+graph TD
+    subgraph Ring 0 [Bare-Metal / Kernel Mode]
+        A[03-Goktug-OS-BOOT <br> ORG 7C00h] -->|Loads into| B[(Sector 0 - Boot RAM)]
+        B -->|Validates| C(0xAA55 Signature)
+        D[04-Pure-VRAM-BIN <br> Flat Binary] -->|Direct Memory Injection| E[(VRAM 0xB800h)]
+    end
+
+    subgraph Ring 3 [Application / DOS Layer]
+        F[01-Moduler-Oyun-Motoru <br> ORG 100h] -->|Shared Memory| G[COM Layout <br> CS=DS=SS]
+        H[02-Guvenli-Kasa-EXE <br> Segmented] -->|Isolated Memory| I[EXE Layout]
+        I -.->|Segment 1| DS[DATA Segment]
+        I -.->|Segment 2| CS[CODE Segment]
+        I -.->|Segment 3| SS[STACK Segment]
+    end
+
+    %% Interactions
+    A -.->|BIOS Interrupt INT 10h| E
+    F -->|Polled I/O INT 16h| KB[Keyboard Buffer]
+    H -->|Syscall INT 21h| Disk[(File System)]
+    
+    style Ring 0 fill:#2b2b2b,stroke:#ff5252,color:#fff
+    style Ring 3 fill:#333333,stroke:#4caf50,color:#fff
+```
 
 ## Requirements
 
