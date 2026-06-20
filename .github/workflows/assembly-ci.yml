@@ -31,6 +31,8 @@ jobs:
         find . -name "*.asm" -exec sed -i 's/.*ENDP.*/; &/' {} +
         # 5. NASM buyuk/kucuk harfe duyarlidir. VRAM dosyasindaki donguyu esitle.
         find . -name "*.asm" -exec sed -i 's/ekrani_boya_dongu/EKRANI_BOYA_DONGU/gi' {} +
+        # 6. Bootloader padding'ini (ORG 7DFEh) NASM standardi olan 'times' dongusune cevir
+        find . -name "*.asm" -exec sed -i 's/ORG 7DFEh/times 510-($-$$) db 0/gi' {} +
 
     - name: Compile Goktug OS Bootloader (Bare-Metal Sector)
       run: |
