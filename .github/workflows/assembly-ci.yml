@@ -17,6 +17,15 @@ jobs:
     - name: Install NASM Compiler
       run: sudo apt-get update && sudo apt-get install -y nasm
 
+    - name: Adapt EMU8086 Syntax for NASM Compatibility
+      run: |
+        echo "Translating MASM/EMU8086 dialect to strict NASM..."
+        # #make_boot# etiketini yorum satirina cevir
+        find . -name "*.asm" -exec sed -i 's/^#make_boot#/; #make_boot#/g' {} +
+        # MASM'a ozel 'BYTE PTR' ve 'WORD PTR' ifadelerini NASM formatina cevir
+        find . -name "*.asm" -exec sed -i 's/BYTE PTR/BYTE/g' {} +
+        find . -name "*.asm" -exec sed -i 's/WORD PTR/WORD/g' {} +
+
     - name: Compile Goktug OS Bootloader (Bare-Metal Sector)
       run: |
         echo "Building Bootloader Kernel..."
